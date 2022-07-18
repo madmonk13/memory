@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html>
+    <HEAD>
+        <meta name="apple-mobile-web-app-capable" content="yes" />
+        <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+        <meta name="viewport" content="user-scalable=no, initial-scale=1.0, maximum-scale=1.0"/>
+        <meta name="apple-mobile-web-app-capable" content="yes"/>
+<TITLE> Memory </TITLE>
+<style>
+* {font: 12px Verdana;}
+
+body {
+	background-color: #999;
+	background: linear-gradient( #999, #333) fixed;
+
+}
+
+#container {
+	width: 100%;
+	height: 100%;
+	margin: 0;
+	padding: 0;
+	position: absolute;
+	left: 0;
+	top: 0;
+}
+
+#header {
+	margin-bottom: 20px;
+	width: 100%;
+	height: auto;
+	background-color: #fff;
+	padding: 5px;
+}
+#header div {
+	display:inline;
+}
+
+#header #score {
+	margin-left: 50px;
+}
+
+#board {
+	display: flex;
+	flex-flow: wrap;
+	justify-content: center;
+	width: 360px;
+	height: auto;
+	margin: 0 auto;
+}
+.card, .matched {
+	display: block;
+	float: left;
+	width: 60px;
+	height: 90px;
+	line-height: 90px;
+	font-family: Arial, Sans-Serif;
+	border: 1px solid black;
+	border-radius: 5px;
+	text-align: center;
+	color: transparent;
+	background-color: #ddd;
+	user-select: none;
+	font-size: 56px;
+	padding: 0;
+	margin: 3px;
+}
+
+.card:hover {
+	border-color: blue;
+	cursor: pointer;
+}
+
+@keyframes reveal {
+	0% {
+		background-color: #ddd;
+		color: transparent;
+		transform:rotate3d(0, 1, 0, 0deg);
+		transform: scaleX(-1);
+	}
+	49% {
+		color: transparent;
+	}
+	50% {
+		color: #666;
+	}
+	100% {
+		background-color: #fff;
+		color: #666;
+		transform:rotate3d(0,1,0,180deg);
+		transform: scaleX(1);
+	}
+}
+
+@keyframes matched {
+	from {background-color: #fff;color: #666;}
+	to {background-color: lightgreen;color: green;}
+}
+
+
+.card_revealed {
+	transform-style: preserve-3d;
+	animation-name: reveal;
+	animation-duration: 0.5s;
+	animation-iteration-count: 1;
+	background-color: #fff;
+	color: #666;
+}
+.matched {
+	animation-name: matched;
+	animation-duration: 0.5s;
+	animation-iteration-count: 1;
+	color: green;
+	background-color: lightgreen;
+}
+
+
+</style>
+<script>
+
+function reveal(id){
+	var d = document.getElementById("card"+id);
+	var testClass = d.className;
+	if ( testClass.search("card_revealed") == -1 ){
+		if ( drawn.length <= 1 ){
+			d.className = d.className + " card_revealed";
+			drawn.push(id);
+		}
+		if ( drawn.length == 2 ) {
+			check(drawn);
+			drawn.push(id);
+		}
+		else if ( drawn.length >= 3 ){
+			resetCards();
+			reveal(id);
+		}
+	}
+}
+
+var t;
+
+function check(drawn){
+	if ( drawn[0] != drawn[1] ){
+		attempts++;
+		var pick1 = document.getElementById("card"+drawn[0]).innerHTML;
+		var pick2 = document.getElementById("card"+drawn[1]).innerHTML;
+		if ( pick1 == pick2 ) {
+			document.getElementById("card"+drawn[0]).className = "matched";
+			document.getElementById("card"+drawn[1]).className = "matched";
+		}
+	}
+	else {
+
+	}
+}
+
+function resetCards(){
+	var t = 0;
+	var c = document.getElementsByClassName("card");
+	for ( a = 0 ; a < c.length ; a++ ) {
+		c[a].className = "card";
+		t++;
+	}
+	if ( t == 0 ) {
+	//	alert("You win!");
+	}
+
+	while(drawn.length > 0) {
+		drawn.pop();
+	}
+	document.getElementById("attempts").innerHTML = attempts;
+
+}
+
+function shuffle(array) {
+  var currentIndex = array.length, temporaryValue, randomIndex ;
+
+  // While there remain elements to shuffle...
+  while (0 !== currentIndex) {
+
+    // Pick a remaining element...
+    randomIndex = Math.floor(Math.random() * currentIndex);
+    currentIndex -= 1;
+
+    // And swap it with the current element.
+    temporaryValue = array[currentIndex];
+    array[currentIndex] = array[randomIndex];
+    array[randomIndex] = temporaryValue;
+  }
+
+  return array;
+}
+
+var attempts = 0;
+var drawn = new Array();
+
+function dealCards(){
+	attempts = 0;
+	drawn = new Array();
+	document.getElementById("board").innerHTML = "";
+	var useGlyphs = document.getElementById("symbols").value;
+	switch ( useGlyphs )
+	{
+		case "2":
+		var glyphs = new Array("&#127923","&#127936","&#127944","&#127948","&#127954","&#127993","&#128692","&#129338","&#129340","&#129356","&#129357","&#127934");
+		break;
+
+		case "3":
+		var glyphs = new Array("&#127815;","&#127817;","&#127820;","&#127821;","&#127822;","&#127828;","&#127829;","&#127831;","&#127837;","&#127839;","&#127849;","&#127846;");
+		break;
+
+		case "4":
+		var glyphs = new Array("&#127925;","&#127926;","&#127927;","&#127928;","&#127929;","&#127930;","&#127931;","&#127932;","&#9835;","&#9836;","&#9837;","&#9839;");
+		break;
+
+		case "5":
+		var glyphs = new Array("&#128012;","&#128013;","&#128014;","&#128017;","&#128018;","&#128024;","&#128025;","&#128031;","&#128034;","&#129435;","&#128054;","&#128051;");
+		break;
+
+		case "6":
+		var glyphs = new Array("&#128513;","&#128514;","&#128518;","&#128519;","&#128520;","&#128521;","&#128523;","&#128526;","&#128530;","&#128540;","&#128544;","&#128567;");
+		break;
+
+		case "7":
+		var glyphs = new Array("&#129411","&#128019","&#128037","&#128330","&#129413","&#129414;","&#129417","&#129444","&#129434","&#128036","&#128039","&#128035");
+		break;
+
+		case "8":
+		var glyphs = new Array("&#128189","&#128421","&#128192","&#128187","&#128424","&#9000","&#128190","&#128377","&#128241","&#128225","&#128193","&#127911");
+		break;
+
+		default:
+		var glyphs = new Array("&#128665","&#128661","&#128640","&#128668","&#128690","&#128642","&#128641","&#128667","&#128748","&#128674","&#128676","&#128659");
+		break;
+	}
+
+	var usable_cards = glyphs.concat(glyphs);
+	cards = shuffle(usable_cards);
+	for ( a = 0 ; a < cards.length ; a++ ){
+		if ( cards[a].substr(0,1) != "&" && cards[a].substr(0,1) != "<" ) {
+			var l = cards[a].length;
+		}
+		let thisCard = document.createElement("div");
+			thisCard.className = "card";
+			thisCard.id = "card"+a;
+			thisCard.setAttribute("onclick","reveal("+a+");");
+			thisCard.innerHTML = cards[a];
+		document.getElementById("board").appendChild(thisCard);
+	}
+}
+
+</script>
+</HEAD>
+<BODY>
+
+<div id="container">
+
+	<div id="header">
+		<div id="controls">
+			Deck: <select name="symbols" id="symbols">
+				<option value="5">Animals</option>
+				<option value="7">Birds</option>
+				<option value="3">Food</option>
+				<option value="4">Music</option>
+				<option value="6">Smileys</option>
+				<option value="2">Sports</option>
+				<option value="8">Tech</option>
+				<option value="1">Vehicles</option>
+			</select>
+			<input type="button" onclick="dealCards();" value="Deal">
+		</div>
+		<div id="score">
+			Flips:<div id="attempts">0</div>
+		</div>
+	</div>
+
+	<div id="content">
+		<div id="board">
+			<!-- <script>dealCards();</script> -->
+		</div>
+	</div>
+</div>
+</BODY>
+</HTML>
